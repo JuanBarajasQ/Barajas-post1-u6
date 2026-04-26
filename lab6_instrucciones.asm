@@ -93,33 +93,35 @@ inicio:
 
 ; BLOQUE 4: Control de flujo
  ; Estructura if/else: comparar valor_a con valor_b
- MOV ax, [valor_a] ; AX = 45
- CMP ax, [valor_b] ; AX - valor_b = 45 - 12 = 33 > 0
- JG .mayor ; salta si AX > valor_b (con signo)
+    MOV  ax, [valor_a]    ; AX = 45
+    CMP  ax, [valor_b]    ; AX - valor_b = 45 - 12 = 33 > 0
+    JG   .mayor           ; salta si AX > valor_b (con signo)
+    JE   .igual           ; salta si AX == valor_b
+    ; AX < valor_b — caso menor (no se alcanza en este programa)
+    XOR  cx, cx           ; CX = 0 como indicador
+    JMP  .fin_cmp
 
- JE .igual ; salta si AX == valor_b
- ; AX < valor_b — caso menor (no se alcanza en este programa)
- XOR cx, cx ; CX = 0 como indicador
- JMP .fin_cmp
+ .mayor:
+    MOV  cx, 1            ; CX = 1: indica que valor_a > valor_b
+    JMP  .fin_cmp
 
-.mayor:
- MOV cx, 1 ; CX = 1: indica que valor_a > valor_b
- JMP .fin_cmp
+ .igual:
+    MOV  cx, 2            ; CX = 2: indica igualdad
 
-.igual:
- MOV cx, 2 ; CX = 2: indica igualdad
+ .fin_cmp:
 
-.fin_cmp:
- ; Bucle: suma acumulada de 1 a 5 (resultado esperado: 15)
- XOR ax, ax ; AX = 0 (acumulador)
- MOV cx, 5 ; CX = contador del bucle
- MOV bx, 1 ; BX = valor inicial a sumar
+ ; Bucle: Factorial de 5 (5! = 120)
+    MOV  ax, 1            ; AX = 1 (identidad multiplicativa) [2]
+    MOV  cx, 5            ; CX = 5 (contador de iteraciones) [2]
+    MOV  bx, 1            ; BX = 1 (multiplicador inicial) [2]
 
-.bucle_suma:
- ADD ax, bx ; AX += BX
- INC bx ; BX++ (siguiente valor)
- LOOP .bucle_suma ; DEC CX; si CX != 0 → .bucle_suma
- ; Al terminar: AX = 1+2+3+4+5 = 15
+ .bucle_factorial:
+    MUL  bx               ; AX = AX * BX (reemplaza ADD) [2]
+    INC  bx               ; BX++ (siguiente número a multiplicar)
+    LOOP .bucle_factorial ; Decrementa CX y salta si CX != 0 [1, 3]
+
+    ; Al terminar: AX = 1*1*2*3*4*5 = 120 (78h en hexadecimal) [2]
+
  ; Fin del programa
- INT 20h ; retornar a DOS
+    INT  20h              ; retornar a DOS [1, 3]
 
